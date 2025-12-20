@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 # Comparative Judging Research Repository - Cursor AI Context
 
 ## Project Overview
