@@ -1,25 +1,20 @@
 """
-Comparative Judging for Remote Viewing Sessions
+Comparative Judging System for Remote Viewing Research
 
-This package provides tools for evaluating remote viewing sessions using
-AI-powered comparative judging against target and decoy images.
+This package provides tools for running comparative judging on remote viewing sessions
+using the exact same logic as Social RV's production system.
 """
 
-from .agent import (
+from .api_client import SocialRVClient, SessionData, TargetData
+from .judging import (
+    perform_comparative_judging,
+    install_nodejs_dependencies,
     SessionFile,
-    TargetImage,
-    DecoyJudgeInput,
-    RankedTarget,
-    RankingResult,
-    VerificationResult,
-    DecoyJudgeOutput,
-    DecoyJudgeState,
-    create_decoy_judge_graph,
-    judge_session_against_decoys,
-    create_initial_state,
-    graph,
+    Target,
+    RankedMatch,
+    ComparativeJudgingResult,
+    ComparativeJudgingError,
 )
-
 from .utils import (
     encode_image_to_base64,
     encode_pdf_to_base64,
@@ -32,26 +27,20 @@ from .utils import (
     create_test_data_from_urls,
 )
 
-from .api_client import (
-    SocialRVClient,
-)
-
 __all__ = [
-    # Agent types
+    # API Client
+    "SocialRVClient",
+    "SessionData",
+    "TargetData",
+    # Judging
+    "perform_comparative_judging",
+    "install_nodejs_dependencies",
     "SessionFile",
-    "TargetImage",
-    "DecoyJudgeInput",
-    "RankedTarget",
-    "RankingResult",
-    "VerificationResult",
-    "DecoyJudgeOutput",
-    "DecoyJudgeState",
-    # Agent functions
-    "create_decoy_judge_graph",
-    "judge_session_against_decoys",
-    "create_initial_state",
-    "graph",
-    # Utils
+    "Target",
+    "RankedMatch",
+    "ComparativeJudgingResult",
+    "ComparativeJudgingError",
+    # Utilities
     "encode_image_to_base64",
     "encode_pdf_to_base64",
     "download_and_encode_image",
@@ -61,7 +50,6 @@ __all__ = [
     "create_session_files_from_urls",
     "create_targets_from_urls",
     "create_test_data_from_urls",
-    # API Client
-    "SocialRVClient",
 ]
 
+__version__ = "1.0.0"

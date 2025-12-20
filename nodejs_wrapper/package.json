@@ -1,0 +1,19 @@
+{
+  "name": "comparative-judging-wrapper",
+  "version": "1.0.0",
+  "description": "Node.js wrapper for Social RV's comparative judging logic",
+  "type": "module",
+  "main": "cli.js",
+  "scripts": {
+    "judge": "node cli.js"
+  },
+  "dependencies": {
+    "openai": "^4.73.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2"
+  }
+}
+

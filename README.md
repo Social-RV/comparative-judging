@@ -1,160 +1,213 @@
-# Comparative Judging for Remote Viewing
+# Comparative Judging for Remote Viewing Research
 
-Open source implementation of the Comparative Judging system used by [Social RV](https://social-rv.com) for evaluating remote viewing sessions.
+This repository provides tools for running comparative judging on remote viewing sessions using the **exact same logic** as Social RV's production system.
 
 ## Overview
 
-Comparative Judging is an AI-powered method for evaluating remote viewing sessions by comparing them against the correct target and several decoy targets. This approach:
+Comparative judging is a method for evaluating remote viewing sessions by comparing session data against multiple potential targets simultaneously. The AI judge is presented with the user's session alongside the correct target mixed randomly with decoy targets. This blinded approach prevents bias and provides a more objective assessment.
 
-- **Reduces bias**: The AI doesn't know which target is correct
-- **Provides ranking**: Sessions are ranked from best match (1) to worst match
-- **Includes reasoning**: Detailed explanations for each ranking decision
-- **Is verifiable**: Built-in verification to ensure consistent reasoning
+## How It Works
 
-## Setup
+This implementation uses Social RV's **multi-pass elimination algorithm**:
+
+1. **Pass 1**: AI sees all 10 targets (1 correct + 9 decoys) and selects top 3 matches (ranks 1-3)
+   - If correct target is found → STOP
+2. **Pass 2**: AI sees remaining 7 targets and selects top 3 (ranks 4-6)
+   - If correct target is found → STOP
+3. **Pass 3**: AI sees remaining 4 targets and selects top 3 (ranks 7-9)
+   - If correct target is found → STOP
+4. **Final**: Last remaining target automatically gets rank 10
+
+This approach is more efficient than ranking all 10 targets at once and stops early when the correct target is found.
+
+## Architecture
+
+The system consists of two parts:
+
+1. **Python API Client** (`src/comparative_judging/`) - Fetches session data from Social RV's Research API
+2. **TypeScript Judging Logic** (`nodejs_wrapper/`) - Exact copy of Social RV's production code
+
+The Python code calls the TypeScript implementation via a Node.js subprocess, ensuring 100% identical logic to Social RV's production system.
+
+## Installation
 
 ### Prerequisites
 
-- Python 3.10+
-- [UV](https://docs.astral.sh/uv/) package manager
+- Python 3.8+
+- Node.js 18+ and npm
 - OpenAI API key
-- Social RV Research API key (for accessing session data)
+- Social RV Research API key
 
-### Installation
+### Setup
 
 1. Clone this repository:
-
 ```bash
-git clone https://github.com/your-org/comparative-judging.git
+git clone https://github.com/yourusername/comparative-judging.git
 cd comparative-judging
 ```
 
-2. Install dependencies with UV:
-
+2. Install Python dependencies:
 ```bash
-uv sync
+pip install -e .
+# or with uv:
+uv pip install -e .
 ```
 
-3. Create a `.env` file with your credentials, you should have recieved a 1password link with the two secrets you need:
-
-```env
-# OpenAI API key for running the comparative judging model
-OPENAI_API_KEY=sk-...
-
-# Social RV Research API key for fetching session data
-RESEARCH_API_KEY=your-research-api-key
+3. Install Node.js dependencies:
+```bash
+cd nodejs_wrapper
+npm install
+cd ..
 ```
 
-## Project Structure
-
-```
-comparative-judging/
-├── README.md                    # This file
-├── pyproject.toml               # Python dependencies
-├── .env.example                 # Environment template
-├── docs/
-│   └── research-api-endpoints.md   # API documentation
-├── src/
-│   └── comparative_judging/
-│       ├── __init__.py
-│       ├── agent.py             # Main LangGraph agent
-│       └── utils.py             # Helper utilities
-└── notebooks/
-    ├── 01_api_example.ipynb     # API usage examples
-    ├── 02_export_to_xlsx.ipynb  # Export sessions to Excel
-    └── 03_run_judging.ipynb     # Run comparative judging
+4. Create a `.env` file with your API keys:
+```bash
+OPENAI_API_KEY=your_openai_key_here
+RESEARCH_API_KEY=your_social_rv_research_key_here
+SOCIAL_RV_API_URL=https://social-rv.com
 ```
 
 ## Usage
 
-### Using the Agent Programmatically
+### Jupyter Notebooks
+
+The easiest way to get started is with the included notebooks:
+
+1. **`notebooks/01_api_example.ipynb`** - Learn how to use the Social RV API
+2. **`notebooks/02_export_to_xlsx.ipynb`** - Export session data to Excel
+3. **`notebooks/03_run_judging.ipynb`** - Run comparative judging on sessions
+
+### Python API
 
 ```python
-from comparative_judging import judge_session_against_decoys, SessionFile, TargetImage
+from comparative_judging import (
+    SocialRVClient,
+    perform_comparative_judging,
+    create_session_file_from_url,
+    create_target_from_url,
+)
 
-# Create session files from URLs
+# Initialize client
+client = SocialRVClient()
+
+# Fetch a session with its target and decoys
+data = client.get_session_with_decoys(session_id)
+
+# Prepare inputs
 session_files = [
-    SessionFile(
-        filename="session.pdf",
-        mime_type="application/pdf",
-        base64_content="..."  # Base64 encoded content
-    )
+    create_session_file_from_url(media['url'])
+    for media in data['session'].session_media_urls
 ]
 
-# Create target and decoys
-target = TargetImage(
-    id="target-uuid",
-    description="A red brick building",
-    base64_image="..."  # Base64 encoded image
+target = create_target_from_url(
+    target_id=data['target'].id,
+    description=data['target'].description,
+    image_url=data['target'].image_url
 )
 
 decoys = [
-    TargetImage(id="decoy1", description="...", base64_image="..."),
-    TargetImage(id="decoy2", description="...", base64_image="..."),
-    # ... more decoys
+    create_target_from_url(
+        target_id=d.id,
+        description=d.description,
+        image_url=d.image_url
+    )
+    for d in data['decoys']
 ]
 
-# Run the judge
-result = await judge_session_against_decoys(
+# Run comparative judging
+result = perform_comparative_judging(
     session_files=session_files,
-    target=target,
-    decoys=decoys
+    current_target=target,
+    historical_targets=decoys
 )
 
 print(f"Correct target ranked: {result.correct_target_rank}")
-print(f"Verification passed: {result.verification_passed}")
+print(f"Total targets ranked: {result.total_targets_ranked}")
 ```
 
-## How It Works
+## API Documentation
 
-### The Comparative Judging Process
+### Social RV Research API
 
-1. **Input Preparation**: Session files (PDFs, images) and target images are encoded to base64
-2. **Ranking Node**: GPT-4 Vision analyzes session content against all targets
-3. **Verification Node**: A second pass verifies the reasoning is consistent
-4. **Result**: Rankings with detailed reasoning for each target
+See `docs/research-api-endpoints.md` for full API documentation.
 
-### Key Concepts
+Key endpoints:
+- `GET /api/research/sessions` - List or fetch sessions
+- `GET /api/research/targets` - List or fetch targets
 
-- **Session Files**: The viewer's work (drawings, notes, impressions)
-- **Target**: The correct target the viewer was attempting to perceive
-- **Decoys**: Other valid targets used for comparison
-- **Rank**: Position from 1 (best match) to N (worst match)
-
-## API Reference
-
-See [docs/research-api-endpoints.md](docs/research-api-endpoints.md) for full API documentation.
-
-### Quick Examples
+### Comparative Judging
 
 ```python
-import requests
-
-api_key = "YOUR_API_KEY"
-base_url = "https://social-rv.com"
-headers = {"X-API-Key": api_key}
-
-# Fetch sessions
-response = requests.get(
-    f"{base_url}/api/research/sessions",
-    headers=headers,
-    params={"page_size": 100}
-)
-sessions = response.json()["sessions"]
-
-# Fetch a specific target
-response = requests.get(
-    f"{base_url}/api/research/targets",
-    headers=headers,
-    params={"id": "target-uuid"}
-)
-target = response.json()["target"]
+perform_comparative_judging(
+    session_files: List[SessionFile],
+    current_target: Target,
+    historical_targets: List[Target]
+) -> ComparativeJudgingResult
 ```
 
-## Contributing
+**Parameters:**
+- `session_files`: List of session files (images/PDFs) with URLs
+- `current_target`: The correct target
+- `historical_targets`: List of 9 decoy targets
 
-We welcome contributions! Please see our contributing guidelines for more information.
+**Returns:**
+- `overall_reasoning`: AI's overall analysis
+- `top_matches`: List of ranked targets with reasoning
+- `correct_target_rank`: Where the correct target ranked (1-10)
+- `total_targets_ranked`: How many targets were ranked before stopping
+
+## Validation
+
+To validate that this implementation matches Social RV's production system:
+
+1. Run comparative judging on a session that already has a rank in Social RV
+2. Compare the results - they should be similar but may differ due to:
+   - Random shuffling of targets
+   - AI non-determinism (even with low temperature)
+   - Different decoys if you're not using the same ones
+
+The **logic is identical**, but the **results will vary** due to randomization.
+
+## Development
+
+### Project Structure
+
+```
+comparative-judging/
+├── src/comparative_judging/
+│   ├── __init__.py
+│   ├── api_client.py       # Social RV API client
+│   ├── judging.py          # Python wrapper for TypeScript
+│   └── utils.py            # Helper functions
+├── nodejs_wrapper/
+│   ├── comparative-judging.server.ts  # Exact copy from Social RV
+│   ├── cli.ts              # Command-line interface
+│   ├── types.ts            # Type definitions
+│   └── package.json        # Node.js dependencies
+├── notebooks/              # Jupyter notebooks
+└── docs/                   # Documentation
+```
+
+### Keeping in Sync with Social RV
+
+To update the TypeScript implementation:
+
+```bash
+cp /path/to/social-rv/app/services/ai/comparative-judging.server.ts nodejs_wrapper/
+```
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT
+
+## Contributing
+
+This is a research tool for validating Social RV's comparative judging system. If you find discrepancies or bugs, please open an issue.
+
+## Citation
+
+If you use this tool in your research, please cite:
+
+```
+[Citation information to be added]
+```

@@ -24,6 +24,13 @@ wheels/
 .venv/
 .uv/
 
+# Node.js
+nodejs_wrapper/node_modules
+nodejs_wrapper/dist/
+nodejs_wrapper/*.log
+nodejs_wrapper/*.tsbuildinfo
+nodejs_wrapper/*.js.map
+
 # Jupyter Notebook
 .ipynb_checkpoints/
 *.ipynb_checkpoints/
