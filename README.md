@@ -28,7 +28,11 @@ RESEARCH_API_KEY=your_research_key_here
 OPENAI_API_KEY=your_openai_key_here
 ```
 
-### 2. Open in Cursor
+### 2. Clone this repo from github
+
+Use either a git-compatible tool or click "Download Zip" on Github under the Code button
+
+### 3. Download Cursor, and open the cloned Repo
 
 This repository is designed to work with **Cursor AI** (cursor.com), an AI-powered code editor.
 
@@ -36,7 +40,7 @@ This repository is designed to work with **Cursor AI** (cursor.com), an AI-power
 2. Open this repository in Cursor
 3. Press `Cmd+Shift+I` (Mac) or `Ctrl+Shift+I` (Windows/Linux) to open Cursor Agent
 
-### 3. Let Cursor Help You Set Up
+### 4. Let Cursor Help You Set Up
 
 Tell Cursor Agent:
 
