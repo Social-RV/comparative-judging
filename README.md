@@ -23,25 +23,19 @@ Comparative Judging is an AI-powered method for evaluating remote viewing sessio
 ### Installation
 
 1. Clone this repository:
+
 ```bash
 git clone https://github.com/your-org/comparative-judging.git
 cd comparative-judging
 ```
 
 2. Install dependencies with UV:
+
 ```bash
 uv sync
 ```
 
-3. Create a `.env` file with your credentials:
-```bash
-cp .env.example .env
-# Edit .env with your API keys
-```
-
-### Environment Variables
-
-Create a `.env` file with the following:
+3. Create a `.env` file with your credentials, you should have recieved a 1password link with the two secrets you need:
 
 ```env
 # OpenAI API key for running the comparative judging model
@@ -49,9 +43,6 @@ OPENAI_API_KEY=sk-...
 
 # Social RV Research API key for fetching session data
 RESEARCH_API_KEY=your-research-api-key
-
-# Social RV API base URL (production or staging)
-SOCIAL_RV_API_URL=https://social-rv.com
 ```
 
 ## Project Structure
@@ -75,16 +66,6 @@ comparative-judging/
 ```
 
 ## Usage
-
-### Running the Notebooks
-
-```bash
-# Start Jupyter
-uv run jupyter notebook
-
-# Or use JupyterLab
-uv run jupyter lab
-```
 
 ### Using the Agent Programmatically
 
