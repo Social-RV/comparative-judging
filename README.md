@@ -16,18 +16,17 @@ This repository contains:
 
 ### 1. Get Your API Keys
 
-You'll need two API keys:
+**You'll receive a 1Password link** with all the API keys you need:
 
-**Social RV Research API Key:**
+- **Social RV Research API Key** - gives you access to our research data
+- **OpenAI API Key** - needed to run the AI judging system (uses GPT-4o)
 
-- Get it from this 1Password link: [LINK TO BE PROVIDED]
-- This gives you access to our research data
+Once you have the keys from 1Password, create a `.env` file in the root of this project:
 
-**OpenAI API Key:**
-
-- Get one at [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-- Needed to run the AI judging system (uses GPT-4o)
-- ⚠️ Note: Running AI judgments costs money (~$0.05-0.15 per session)
+```env
+RESEARCH_API_KEY=your_research_key_here
+OPENAI_API_KEY=your_openai_key_here
+```
 
 ### 2. Open in Cursor
 
@@ -71,74 +70,6 @@ Cursor AI knows all about this repository (we've configured special rules for it
 - "How do I analyze which users perform best?"
 - "Help me create a visualization of judging results"
 
-### Common Tasks
-
-**Fetch data from the API:**
-
-```python
-from comparative_judging import SocialRVClient
-client = SocialRVClient()
-sessions = client.fetch_all_sessions()
-```
-
-**Run judging on a session:**
-
-```python
-from comparative_judging import perform_comparative_judging
-# See notebook 03 for complete example
-result = perform_comparative_judging(session_files, target, decoys)
-```
-
-**Export to Excel:**
-
-```python
-import pandas as pd
-df = pd.DataFrame([s.to_dict() for s in sessions])
-df.to_excel('sessions.xlsx', index=False)
-```
-
-## Understanding the System
-
-### Remote Viewing Sessions
-
-A **session** is when a user attempts to perceive a target:
-
-- User gets a random coordinate (e.g., "X9K42")
-- User meditates and records their impressions as drawings
-- User submits their drawings (PNG or PDF files)
-
-### The AI Scoring System
-
-We use **comparative judging** to score sessions:
-
-1. Take the user's drawings
-2. Show them to an AI judge alongside 10 targets:
-   - 1 correct target (what they were supposed to see)
-   - 9 decoy targets (random other targets)
-3. AI ranks which target best matches the drawings
-4. Rank 1 = perfect match, Rank 10 = worst match
-
-The AI uses a smart multi-pass system that stops early when it finds a good match.
-
-### Your Research Goals
-
-You're here to:
-
-- ✅ Validate that our AI scoring system is fair and accurate
-- 📈 Analyze whether users perform better than random chance
-- 🔍 Identify what makes a successful remote viewing session
-- 📝 Write academic papers about the results
-
-## Important Notes
-
-### Costs
-
-Running the AI judging system uses OpenAI's API, which costs money:
-
-- ~$0.05 to $0.15 per session judged
-- If you're running judgments on 1,000 sessions, budget ~$50-150
-- Cursor can help you estimate costs before running large batches
-
 ### Data Privacy
 
 The data you're accessing is anonymized:
@@ -146,6 +77,7 @@ The data you're accessing is anonymized:
 - User display names are shown (but not real names or emails)
 - Session drawings are public data submitted to Social RV
 - Target information is public
+- Users have an ability to opt-out of having their sessions shared with vetted researchers on the settings page. Our api respects these settings.
 
 ### Technical Architecture
 
