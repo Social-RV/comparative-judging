@@ -8,15 +8,8 @@ All research endpoints support two authentication methods:
 
 ### Option 1: API Key (Recommended for Scripts)
 
-Use an API key for programmatic access. Include it in your requests using one of these methods:
+Use an API key for programmatic access via the `X-API-Key` header:
 
-**Authorization Header (Bearer Token):**
-```bash
-curl -X GET "https://social-rv.com/api/research/sessions" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-**X-API-Key Header:**
 ```bash
 curl -X GET "https://social-rv.com/api/research/sessions" \
   -H "X-API-Key: YOUR_API_KEY"
@@ -278,56 +271,56 @@ Retrieves target data with signed URLs for target images.
 
 ```bash
 curl -X GET "https://social-rv.com/api/research/sessions" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ### Get a Single Session by ID
 
 ```bash
 curl -X GET "https://social-rv.com/api/research/sessions?id=abc123-def456" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ### Bulk Get Multiple Sessions
 
 ```bash
 curl -X GET "https://social-rv.com/api/research/sessions?ids=id1,id2,id3,id4,id5" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ### Get a Single Target by ID
 
 ```bash
 curl -X GET "https://social-rv.com/api/research/targets?id=target-uuid-here" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ### Bulk Get Multiple Targets
 
 ```bash
 curl -X GET "https://social-rv.com/api/research/targets?ids=t1,t2,t3" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ### Include Low-Value Sessions
 
 ```bash
 curl -X GET "https://social-rv.com/api/research/sessions?include_low_value_sessions=true" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ### Filter by User
 
 ```bash
 curl -X GET "https://social-rv.com/api/research/sessions?display_name=RemoteViewer123" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ### Custom Pagination and Sorting
 
 ```bash
 curl -X GET "https://social-rv.com/api/research/sessions?page=2&page_size=50&sort_key=P_VALUE&sort_direction=asc" \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ### Python Example
@@ -342,7 +335,7 @@ api_key = "YOUR_API_KEY"
 base_url = "https://social-rv.com"
 
 headers = {
-    "Authorization": f"Bearer {api_key}"
+    "X-API-Key": api_key
 }
 
 # Fetch sessions with pagination

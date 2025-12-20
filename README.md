@@ -132,7 +132,7 @@ import requests
 
 api_key = "YOUR_API_KEY"
 base_url = "https://social-rv.com"
-headers = {"Authorization": f"Bearer {api_key}"}
+headers = {"X-API-Key": api_key}
 
 # Fetch sessions
 response = requests.get(
