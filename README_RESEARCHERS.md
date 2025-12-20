@@ -174,9 +174,8 @@ Just open Cursor Agent and ask!
 ### Documentation
 
 - **API Docs:** See `docs/research-api-endpoints.md` for complete API reference
-- **Technical README:** See `README_TECHNICAL.md` for detailed technical documentation
+- **Technical README:** See `README.md` for detailed technical documentation
 - **Example Notebooks:** See `notebooks/` for working examples
-- **Cursor Rules:** The `.cursorrules` file contains comprehensive context for Cursor AI
 
 ### Still Stuck?
 
