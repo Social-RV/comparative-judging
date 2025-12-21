@@ -115,7 +115,7 @@ npm --version   # Should show 9.x.x or higher
 ### Step 3: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/comparative-judging.git
+git clone https://github.com/Social-RV/comparative-judging.git
 cd comparative-judging
 ```
 
