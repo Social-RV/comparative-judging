@@ -262,8 +262,19 @@ async function performSinglePassJudging(
     await createComparativeJudgingPrompt(sessionFiles, targets);
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-5.2-2025-12-11',
+    const model = 'gpt-4o';
+  
+    // const model = 'gpt-4o-2024-11-20';
+    // const model = 'gpt-4o-2024-08-06';
+    // const model = 'gpt-4o-2024-05-13';
+
+    // const model = 'gpt-5.2-2025-12-11';
+    // const model = 'gpt-5-mini-2025-08-07';
+
+    // Build request body with model-specific token parameter
+    // GPT-5 and o-series use max_completion_tokens, GPT-4 and earlier use max_tokens
+    const requestBody: any = {
+      model: model,
       messages: [
         {
           role: 'system',
@@ -274,7 +285,6 @@ async function performSinglePassJudging(
           content: messageContent,
         },
       ],
-      max_completion_tokens: 2000,
       response_format: {
         type: 'json_schema',
         json_schema: {
@@ -323,7 +333,18 @@ async function performSinglePassJudging(
           },
         },
       },
-    });
+    };
+    
+    // Add model-specific token parameter
+    // GPT-5 models use max_completion_tokens
+    // GPT-4 and earlier models use max_tokens
+    if (model.startsWith('gpt-5')) {
+      requestBody.max_completion_tokens = 2000;
+    } else {
+      requestBody.max_tokens = 2000;
+    }
+
+    const response = await openai.chat.completions.create(requestBody);
 
     const result = response.choices[0]?.message?.content?.trim();
 
@@ -356,15 +377,13 @@ async function performSinglePassJudging(
   } catch (error) {
     // Check if it's an OpenAI API error
     if (error && typeof error === 'object' && 'status' in error) {
-      const apiError = error as { status: number; message?: string; error?: any };
+      const apiError = error as { status: number };
       if (apiError.status === 429) {
         throw createAIError('RATE_LIMIT', 'Rate limit exceeded', apiError);
       } else if (apiError.status === 400) {
-        // Include the full OpenAI error message for better debugging
-        const errorMessage = apiError.error?.message || apiError.message || 'Invalid input provided';
         throw createAIError(
           'INVALID_INPUT',
-          `Invalid input provided: ${errorMessage}`,
+          'Invalid input provided',
           apiError,
         );
       }
