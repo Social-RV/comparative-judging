@@ -263,7 +263,7 @@ async function performSinglePassJudging(
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-5.2-2025-12-11',
       messages: [
         {
           role: 'system',
@@ -274,7 +274,7 @@ async function performSinglePassJudging(
           content: messageContent,
         },
       ],
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
       response_format: {
         type: 'json_schema',
         json_schema: {
@@ -356,13 +356,15 @@ async function performSinglePassJudging(
   } catch (error) {
     // Check if it's an OpenAI API error
     if (error && typeof error === 'object' && 'status' in error) {
-      const apiError = error as { status: number };
+      const apiError = error as { status: number; message?: string; error?: any };
       if (apiError.status === 429) {
         throw createAIError('RATE_LIMIT', 'Rate limit exceeded', apiError);
       } else if (apiError.status === 400) {
+        // Include the full OpenAI error message for better debugging
+        const errorMessage = apiError.error?.message || apiError.message || 'Invalid input provided';
         throw createAIError(
           'INVALID_INPUT',
-          'Invalid input provided',
+          `Invalid input provided: ${errorMessage}`,
           apiError,
         );
       }
