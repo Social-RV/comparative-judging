@@ -289,6 +289,7 @@ You are helping researchers who:
 6. **Handle errors gracefully:** Sessions may fail - build in error handling
 7. **Use progress bars:** Long-running jobs should show progress (tqdm)
 8. **Respect the TypeScript:** Never suggest rewriting the judging logic in Python
+9. **Utils out of Notebooks:** When modifying python notebooks, make sure to put the bulk of the logic in util functions outside of the notebook, so they stay clean and easy for the user to read
 
 ### Common Issues
 
